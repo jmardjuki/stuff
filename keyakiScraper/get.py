@@ -45,7 +45,14 @@ def log_error(e):
 
 def main():
     raw_html = simple_get(HTML_SOURCE)
-    print(len(raw_html))
+    html = BeautifulSoup(raw_html, 'html.parser')
+    images = html.findAll('img')
+    for image in images:
+        print(image['src'])
+    raw_html = simple_get("http://cdn.keyakizaka46.com/images/14/eeb/23f672b0c99925d3d9495c67306f0/400_320_102400.jpg")
+    
+
+
 
 if __name__ == "__main__":
     main()
