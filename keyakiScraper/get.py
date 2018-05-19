@@ -1,10 +1,13 @@
 # Modified from https://realpython.com/python-web-scraping-practical-introduction/
+import os
+import wget
 from requests import get
 from requests.exceptions import RequestException
 from contextlib import closing
 from bs4 import BeautifulSoup
 
 HTML_SOURCE='http://www.keyakizaka46.com/s/k46o/search/artist?ima=0000'
+IMAGE_DST=os.getenv("HOME") + '/images/'
 
 def simple_get(url):
     """
@@ -42,15 +45,18 @@ def log_error(e):
     """
     print(e)
 
+def dl_fullsize(imgSrc):
+    fullSize = "800_640"
+    dl = imgSrc.replace("400_320", fullSize)
+    wget.download(dl, out=IMAGE_DST)
+    ## Current problem is all have same name, take name from?
 
 def main():
     raw_html = simple_get(HTML_SOURCE)
     html = BeautifulSoup(raw_html, 'html.parser')
     images = html.findAll('img')
     for image in images:
-        print(image['src'])
-    raw_html = simple_get("http://cdn.keyakizaka46.com/images/14/eeb/23f672b0c99925d3d9495c67306f0/400_320_102400.jpg")
-    
+        dl_fullsize(image['src'])
 
 
 
