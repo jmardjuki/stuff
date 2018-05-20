@@ -6,7 +6,7 @@ from requests.exceptions import RequestException
 from contextlib import closing
 from bs4 import BeautifulSoup
 
-HTML_SOURCE='http://www.keyakizaka46.com/s/k46o/search/artist?ima=0000'
+HTML_SRC='http://www.keyakizaka46.com/s/k46o/search/artist?ima=0000'
 IMAGE_DST=os.getenv("HOME") + '/images/'
 
 def simple_get(url):
@@ -45,19 +45,29 @@ def log_error(e):
     """
     print(e)
 
-def dl_fullsize(imgSrc):
+def dl_fullsize(imgSrc, name):
     fullSize = "800_640"
     dl = imgSrc.replace("400_320", fullSize)
-    wget.download(dl, out=IMAGE_DST)
-    ## Current problem is all have same name, take name from?
+    nameFile = IMAGE_DST + name + ".jpg"
+    wget.download(dl, out=nameFile)
 
 def main():
-    raw_html = simple_get(HTML_SOURCE)
+    raw_html = simple_get(HTML_SRC)
     html = BeautifulSoup(raw_html, 'html.parser')
     images = html.findAll('img')
     for image in images:
-        dl_fullsize(image['src'])
-
+        parent = image.find_parents("li", attrs={"data-member":True})
+        print(parent)
+        if ('data-member="42"' in parent):
+            print("/t I'm on break")
+            break
+        dl_image = image['src']
+        name = image.findNext('p', class_="name")
+        name = name.contents[0]
+        name = name.replace(" ", "")
+        print(name)
+        dl_fullsize(dl_image, name)
+   	# Stop when data-member id is 42 (thus the parent)
 
 
 if __name__ == "__main__":
