@@ -56,17 +56,17 @@ def main():
     html = BeautifulSoup(raw_html, 'html.parser')
     images = html.findAll('img')
     for image in images:
+        dl_image = image['src']
+        name = image.findNext('p', class_="name")
+        name = str(name.contents[0])
+        name = name.replace(" ", "")
+        dl_fullsize(dl_image, name)
    	# Stop when data-member id is 42 (Berika)
         parent = image.find_parents("li", attrs={"data-member":True})
         parent = str(parent)
         if ('data-member="42"' in parent):
             break
-        dl_image = image['src']
-        name = image.findNext('p', class_="name")
-        name = name.contents[0]
-        name = name.replace(" ", "")
-        dl_fullsize(dl_image, name)
-
+ 
 
 if __name__ == "__main__":
     main()
