@@ -46,7 +46,7 @@ def log_error(e):
     print(e)
 
 def dl_fullsize(imgSrc, name):
-    fullSize = "800_640"
+    fullSize = "3156_3840"
     dl = imgSrc.replace("400_320", fullSize)
     nameFile = IMAGE_DST + name + ".jpg"
     wget.download(dl, out=nameFile)
@@ -59,6 +59,7 @@ def main():
         dl_image = image['src']
         name = image.findNext('p', class_="name")
         name = str(name.contents[0])
+        name = name.strip()
         name = name.replace(" ", "")
         dl_fullsize(dl_image, name)
    	# Stop when data-member id is 42 (Berika)
