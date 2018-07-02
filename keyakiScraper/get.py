@@ -1,6 +1,6 @@
 # Modified from https://realpython.com/python-web-scraping-practical-introduction/
 import os
-import wget
+import urllib
 from requests import get
 from requests.exceptions import RequestException
 from contextlib import closing
@@ -49,7 +49,7 @@ def dl_fullsize(imgSrc, name):
     fullSize = "3156_3840"
     dl = imgSrc.replace("400_320", fullSize)
     nameFile = IMAGE_DST + name + ".jpg"
-    wget.download(dl, out=nameFile)
+    urllib.request.urlretrieve(dl, nameFile)
 
 def main():
     raw_html = simple_get(HTML_SRC)
