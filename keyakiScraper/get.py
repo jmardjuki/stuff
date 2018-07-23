@@ -46,8 +46,7 @@ def log_error(e):
     print(e)
 
 def dl_fullsize(imgSrc, name):
-    fullSize = "3156_3840"
-    dl = imgSrc.replace("400_320", fullSize)
+    dl = imgSrc.replace("/400_320_102400", '')
     nameFile = IMAGE_DST + name + ".jpg"
     urllib.request.urlretrieve(dl, nameFile)
 
@@ -62,9 +61,9 @@ def main():
         name = name.strip()
         name = name.replace(" ", "")
         dl_fullsize(dl_image, name)
-   	# Stop when data-member id is 42 (Berika)
         parent = image.find_parents("li", attrs={"data-member":True})
         parent = str(parent)
+   	# Stop when data-member id is 42 (Miho)
         if ('data-member="42"' in parent):
             break
  
