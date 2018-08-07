@@ -46,15 +46,13 @@ def log_error(e):
     print(e)
 
 def dl_fullsize(imgSrc, name):
+    # Fullsize is the actual filename
     dl = imgSrc.replace("/400_320_102400", '')
     nameFile = IMAGE_DST + name + ".jpg"
     urllib.request.urlretrieve(dl, nameFile)
 
-def main():
-    raw_html = simple_get(HTML_SRC)
-    html = BeautifulSoup(raw_html, 'html.parser')
-    images = html.findAll('img')
-    for image in images:
+def loop_images(images_tags):
+    for image in images_tags:
         dl_image = image['src']
         name = image.findNext('p', class_="name")
         name = str(name.contents[0])
@@ -66,6 +64,14 @@ def main():
    	# Stop when data-member id is 42 (Miho)
         if ('data-member="42"' in parent):
             break
+
+    
+
+def main():
+    raw_html = simple_get(HTML_SRC)
+    html = BeautifulSoup(raw_html, 'html.parser')
+    image_tags = html.findAll('img')
+    loop_images(image_tags)
  
 
 if __name__ == "__main__":
