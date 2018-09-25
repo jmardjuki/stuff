@@ -49,6 +49,7 @@ def dl_fullsize(imgSrc, name):
     # Fullsize is the actual filename
     dl = imgSrc.replace("/400_320_102400", '')
     nameFile = IMAGE_DST + name + ".jpg"
+    ## TO DO: Should have try and catch
     urllib.request.urlretrieve(dl, nameFile)
 
 def loop_images(images_tags):
@@ -62,6 +63,7 @@ def loop_images(images_tags):
         parent = image.find_parents("li", attrs={"data-member":True})
         parent = str(parent)
    	# Stop when data-member id is 42 (Miho)
+        # TO DO: Seperate Hiragana and Kanji members
         if ('data-member="42"' in parent):
             break
 
