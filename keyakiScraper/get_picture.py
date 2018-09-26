@@ -56,14 +56,13 @@ def loop_images(images_tags):
     for image in images_tags:
         dl_image = image['src']
         name = image.findNext('p', class_="name")
-        name = str(name.contents[0])
-        name = name.strip()
-        name = name.replace(" ", "")
+        name = str(name.contents[0]).strip().replace(" ", "")
         dl_fullsize(dl_image, name)
         parent = image.find_parents("li", attrs={"data-member":True})
-        parent = str(parent)
+        #parent = str(parent)
    	# Stop when data-member id is 42 (Miho)
         # TO DO: Seperate Hiragana and Kanji members
+        #print(parent)
         if ('data-member="42"' in parent):
             break
 
