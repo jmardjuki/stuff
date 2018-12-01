@@ -60,11 +60,15 @@ def dl_fullsize(imgSrc, name):
 def process_html(num):
     html_address = BASE_HTML + num
     raw_html = simple_get(html_address)
-    html = BeautifulSoup(raw_html, 'html.parser')    
+    html = BeautifulSoup(raw_html, 'html.parser')
+
     img_box = html.find("div", {"class": "box-profile_img"})
     img_link = img_box.find("img")['src']
-    print(img_link)
-    
+    #dl_fullsize(img_link, num)
+
+    profile_box = html.find("div", {"class": "box-profile_text"})
+    name = html.find("p", {"class": "name"})
+    print(str(name.text).replace(" ",''))
 
 def main():
     for i in range(1, MAX_MEMBER+1):
