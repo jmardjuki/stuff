@@ -67,8 +67,22 @@ def process_html(num):
     #dl_fullsize(img_link, num)
 
     profile_box = html.find("div", {"class": "box-profile_text"})
-    name = html.find("p", {"class": "name"})
-    print(str(name.text).replace(" ",''))
+    furigana = profile_box.find("p", {"class": "furigana"}).text
+    furigana = furigana.strip()
+    name = profile_box.find("p", {"class": "name"}).text
+    name = name.strip().replace(" ",'')
+    en_name = profile_box.find("span", {"class": "en"}).text
+
+    info_box = profile_box.find("div", {"class": "box-info"})
+    all_info = info_box.findAll("dt")
+    
+    info_arr = []
+    for info in all_info:
+        info_arr.append(info.text.strip())
+
+    birthday, zodiac, height,birthplace, blood_type = info_arr
+    print(blood_type)
+    #get the text for all
 
 def main():
     for i in range(1, MAX_MEMBER+1):
