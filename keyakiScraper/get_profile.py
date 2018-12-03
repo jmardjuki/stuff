@@ -38,7 +38,18 @@ def is_good_response(resp):
 def log_error(e):
     print(e)
 
-def dl_fullsize(imgSrc, name):
+
+def process_image(html, num):
+    """Get the image link and download fullsize
+    @params:
+        object html: BeautifulSoup object that contain tags from profile link
+        string num: member's number; image would be named after
+    """
+    if not os.path.exists(IMAGE_DST):
+        os.makedirs(IMAGE_DST)
+    img_box = html.find("div", {"class": "box-profile_img"})
+    img_link = img_box.find("img")['src']
+
     dl = imgSrc.replace("/400_320_102400", '')
     nameFile = IMAGE_DST + name + ".jpg"
     try:
@@ -46,14 +57,14 @@ def dl_fullsize(imgSrc, name):
     except URLError:
         log_error('Error during requests to {0} : {1}'.format(url, str(e)))
 
-def process_image(html, num):
-    if not os.path.exists(IMAGE_DST):
-        os.makedirs(IMAGE_DST)
-    img_box = html.find("div", {"class": "box-profile_img"})
-    img_link = img_box.find("img")['src']
-    dl_fullsize(img_link, num)
 
 def get_profile(html):
+    """Get the image link and gather the profile details
+    @params:
+        object html: object html: BeautifulSoup object that contain tags from profile link
+    @return:
+        object: a dictionary that contains all the profile data
+    """
     profile_dict = collections.OrderedDict()
     profile_box = html.find("div", {"class": "box-profile_text"})
     name = profile_box.find("p", {"class": "name"}).text
@@ -70,18 +81,25 @@ def get_profile(html):
     for info in all_info:
         info_arr.append(info.text.strip())
 
+    # TO DO: Improve this as it's more than 80 char
     profile_dict['birthday'], profile_dict['horoscope'], profile_dict['height'], profile_dict['birthplace'], profile_dict['blood_type'] = info_arr
     return profile_dict
 
+
 def process_html(num):
+    """Read the profile link, download profile image, and get profile data
+    @params:
+        string num: member's number, the profile link is based on this
+    @return:
+        object: a dictionary that contains all the profile detail
+    """
     html_address = BASE_HTML + num
     raw_html = simple_get(html_address)
     html = BeautifulSoup(raw_html, 'html.parser')
 
     process_image(html, num)
-    profile_dict = get_profile(html)
+    return get_profile(html)
 
-    return profile_dict
 
 def main():
     data = collections.OrderedDict()
