@@ -1,5 +1,7 @@
 # Modified from https://realpython.com/python-web-scraping-practical-introduction/
 import os
+import json
+import collections
 import urllib
 from requests import get
 from requests.exceptions import RequestException
@@ -35,14 +37,14 @@ def is_good_response(resp):
     Returns true if the response seems to be HTML, false otherwise
     """
     content_type = resp.headers['Content-Type'].lower()
-    return (resp.status_code == 200 
-            and content_type is not None 
+    return (resp.status_code == 200
+            and content_type is not None
             and content_type.find('html') > -1)
 
 
 def log_error(e):
     """
-    It is always a good idea to log errors. 
+    It is always a good idea to log errors.
     This function just prints them, but you can
     make it do anything.
     """
@@ -58,6 +60,8 @@ def dl_fullsize(imgSrc, name):
 
 
 def process_html(num):
+    profile_dict = collections.OrderedDict()
+
     html_address = BASE_HTML + num
     raw_html = simple_get(html_address)
     html = BeautifulSoup(raw_html, 'html.parser')
@@ -67,31 +71,35 @@ def process_html(num):
     #dl_fullsize(img_link, num)
 
     profile_box = html.find("div", {"class": "box-profile_text"})
-    furigana = profile_box.find("p", {"class": "furigana"}).text
-    furigana = furigana.strip()
     name = profile_box.find("p", {"class": "name"}).text
-    name = name.strip().replace(" ",'')
-    en_name = profile_box.find("span", {"class": "en"}).text
+    profile_dict['name'] = name.strip().replace(" ",'')
+    profile_dict['furigana'] = profile_box.find("p", {"class": "furigana"}).text.strip()
+    profile_dict['en_name'] = profile_box.find("span",
+            {"class": "en"}).text.replace("\u3000", " ")
 
     info_box = profile_box.find("div", {"class": "box-info"})
     all_info = info_box.findAll("dt")
-    
+
     info_arr = []
     for info in all_info:
         info_arr.append(info.text.strip())
 
-    birthday, zodiac, height,birthplace, blood_type = info_arr
-    print(blood_type)
-    #get the text for all
+    profile_dict['birthday'], profile_dict['zodiac'], profile_dict['height'], profile_dict['birthplace'], profile_dict['blood_type'] = info_arr
+    return profile_dict
 
 def main():
+    data = {}
     for i in range(1, MAX_MEMBER+1):
         # Only access girls who still in Keyaki
         if i not in NULL_MEMBERS:
             num = str(i)
             if ( len(num) == 1):
                 num = '0' + num
-            process_html(num)
+            data[i] = process_html(num)
+    data = json.dumps(data, ensure_ascii=False, indent=4)
+    print(data)
+    with open('data.json', 'w', encoding='utf-8') as outfile:
+        json.dump(data, outfile, ensure_ascii=False)
 
 if __name__ == "__main__":
     main()
