@@ -1,4 +1,3 @@
-# Modified from https://realpython.com/python-web-scraping-practical-introduction/
 import os
 import json
 import collections
@@ -9,7 +8,7 @@ from contextlib import closing
 from bs4 import BeautifulSoup
 
 BASE_HTML='http://www.keyakizaka46.com/s/k46o/artist/'
-IMAGE_DST=os.getenv("HOME") + '/images/'
+IMAGE_DST='./images/'
 
 MAX_MEMBER=42
 NULL_MEMBERS={16} #Grads
@@ -51,6 +50,8 @@ def log_error(e):
     print(e)
 
 def dl_fullsize(imgSrc, name):
+    if not os.path.exists(IMAGE_DST):
+        os.makedirs(IMAGE_DST)
     # Fullsize is the actual filename
     dl = imgSrc.replace("/400_320_102400", '')
     nameFile = IMAGE_DST + name + ".jpg"
@@ -68,7 +69,7 @@ def process_html(num):
 
     img_box = html.find("div", {"class": "box-profile_img"})
     img_link = img_box.find("img")['src']
-    #dl_fullsize(img_link, num)
+    dl_fullsize(img_link, num)
 
     profile_box = html.find("div", {"class": "box-profile_text"})
     name = profile_box.find("p", {"class": "name"}).text
@@ -84,22 +85,20 @@ def process_html(num):
     for info in all_info:
         info_arr.append(info.text.strip())
 
-    profile_dict['birthday'], profile_dict['zodiac'], profile_dict['height'], profile_dict['birthplace'], profile_dict['blood_type'] = info_arr
+    profile_dict['birthday'], profile_dict['horoscope'], profile_dict['height'], profile_dict['birthplace'], profile_dict['blood_type'] = info_arr
     return profile_dict
 
 def main():
-    data = {}
+    data = collections.OrderedDict()
     for i in range(1, MAX_MEMBER+1):
         # Only access girls who still in Keyaki
         if i not in NULL_MEMBERS:
             num = str(i)
             if ( len(num) == 1):
                 num = '0' + num
-            data[i] = process_html(num)
-    data = json.dumps(data, ensure_ascii=False, indent=4)
-    print(data)
+            data[num] = process_html(num)
     with open('data.json', 'w', encoding='utf-8') as outfile:
-        json.dump(data, outfile, ensure_ascii=False)
+        json.dump(data, outfile, indent=4, ensure_ascii=False)
 
 if __name__ == "__main__":
     main()
