@@ -7,7 +7,7 @@ from requests.exceptions import RequestException
 from contextlib import closing
 from bs4 import BeautifulSoup
 
-BASE_HTML='http://www.keyakizaka46.com/s/k46o/artist/'
+BASE_SRC='http://www.keyakizaka46.com/s/k46o/artist/'
 
 MAX_MEMBER=42
 NULL_MEMBERS={16} #Add Grads
@@ -50,10 +50,10 @@ def process_image(html, num):
     img_box = html.find("div", {"class": "box-profile_img"})
     img_link = img_box.find("img")['src']
 
-    dl = imgSrc.replace("/400_320_102400", '')
-    nameFile = IMAGE_DST + name + ".jpg"
+    dl = img_link.replace("/400_320_102400", '')
+    name_file = IMAGE_DST + num + ".jpg"
     try:
-        urllib.request.urlretrieve(dl, nameFile)
+        urllib.request.urlretrieve(dl, name_file)
     except URLError:
         log_error('Error during requests to {0} : {1}'.format(url, str(e)))
 
@@ -61,7 +61,7 @@ def process_image(html, num):
 def get_profile(html):
     """Get the image link and gather the profile details
     @params:
-        object html: object html: BeautifulSoup object that contain tags from profile link
+        object html:BeautifulSoup object that contain tags from profile link
     @return:
         object: a dictionary that contains all the profile data
     """
@@ -86,31 +86,31 @@ def get_profile(html):
     return profile_dict
 
 
-def process_html(num):
-    """Read the profile link, download profile image, and get profile data
-    @params:
-        string num: member's number, the profile link is based on this
-    @return:
-        object: a dictionary that contains all the profile detail
+def process_html():
+    """Read the profile links, download profile image,
+    get profile data and dumps into json
     """
-    html_address = BASE_HTML + num
-    raw_html = simple_get(html_address)
-    html = BeautifulSoup(raw_html, 'html.parser')
-
-    process_image(html, num)
-    return get_profile(html)
-
-
-def main():
+    print("Gathering members' profile")
     data = collections.OrderedDict()
     for i in range(1, MAX_MEMBER+1):
         if i not in NULL_MEMBERS:
             num = str(i)
             if ( len(num) == 1):
                 num = '0' + num
-            data[num] = process_html(num)
+            html_address = BASE_SRC + num
+            raw_html = simple_get(html_address)
+            html = BeautifulSoup(raw_html, 'html.parser')
+            process_image(html, num)
+            data[num] = get_profile(html)
     with open(JSON_DST, 'w', encoding='utf-8') as outfile:
         json.dump(data, outfile, indent=4, ensure_ascii=False)
+    print("All members' profile have been saved")
+    print("Images are saved in:", IMAGE_DST)
+    print("Profiles are saved in:", JSON_DST)
+
+
+def main():
+    process_html()
 
 if __name__ == "__main__":
     main()
