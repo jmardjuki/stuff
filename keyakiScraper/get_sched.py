@@ -9,6 +9,8 @@ BASE_SRC='https://www.hinatazaka46.com/s/official/media/list'
 YEAR_SRC='2019'
 MONTH_SRC='03'
 
+FILE_DST="hinata.txt"
+
 def simple_get(url):
     try:
         with closing(get(url, stream=True)) as resp:
@@ -33,11 +35,30 @@ def log_error(e):
 def main():
     global YEAR_SRC
     global MONTH_SRC
+
     html_link = BASE_SRC + '?' + 'dy=' + YEAR_SRC + MONTH_SRC
     raw_html = simple_get(html_link)
     html_bs = BeautifulSoup(raw_html, 'html.parser')
     list_bs = html_bs.findAll('div', {'p-schedule__list-group'})
-    
+
+    f = open(FILE_DST, "w+")
+
+    for entry in list_bs:
+        txt =""
+        date = entry.find("span").text
+        if (len(date) != 2):
+            date = "0"+ date
+        entry_list = entry.findAll('li', {'p-schedule__item'})
+        for schedule in entry_list:
+            txt = YEAR_SRC + MONTH_SRC + date
+            tp = schedule.find('div', {'c-schedule__category'})
+            txt = txt + ',' + tp.text.strip()
+            time = schedule.find('div', {'c-schedule__time--list'}).text
+            txt = txt + ',' + time.strip()
+            content = schedule.find('p', {'c-schedule__text'}).text
+            txt = txt + ',' + content.strip() + '\n'
+            f.write(txt)
+    f.close()
 
 
 if __name__ == "__main__":
