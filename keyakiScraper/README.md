@@ -1,7 +1,7 @@
 # keyakiSS
 Scripts to collect data from Keyakizaka46's website
 
-### **get_profile.py**
+### **get_picture.py**
 
 Download profile pictures in the highest quality possible, and collect the members' profile in and save in in a single JSON file
 
@@ -21,8 +21,8 @@ $ wget https://raw.githubusercontent.com/jmardjuki/stuff/master/keyakiScraper/ge
 
 Usage
 ```
-$ python3 get_profile.py -h
-usage: get_profile.py [-h] [-i IMAGE] [-d DATA]
+$ python3 get_picture.py -h
+usage: get_picture.py [-h] [-i IMAGE] [-d DATA]
 
 Get Keyakizaka46 data profile and pictures
 
@@ -34,7 +34,7 @@ optional arguments:
 ```
 To run the script with default directory
 ```
-$ python3 get_profile.py
+$ python3 get_picture.py
 ```
 
 >Note: Script will not run with Python2, so make sure you use Python3
