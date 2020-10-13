@@ -13,7 +13,7 @@ MAIN_SRC='https://sakurazaka46.com/s/s46/search/artist'
 BASE_SRC='https://sakurazaka46.com'
 
 IMAGE_DST='images/'
-JSON_DST='keyaki.json'
+JSON_DST='sakurazaka.json'
 
 def simple_get(url):
     try:
@@ -55,7 +55,6 @@ def get_image(member_link_bs_html, num):
     """
     img_box = member_link_bs_html.find("p", {"class": "ph"})
     img_link = BASE_SRC + img_box.find("img")['src']
-    print(img_link)
 
     name_file = IMAGE_DST + num + ".jpg"
     try:
@@ -80,6 +79,7 @@ def download_images_and_profiles(members_links):
 
         get_image(member_link_bs_html, num)
         data[num] = get_profile(member_link_bs_html)
+        print(data[num])
     
     # Save the profile
     with open(JSON_DST, 'w', encoding='utf-8') as outfile:
@@ -100,23 +100,23 @@ def get_profile(html):
         object: a dictionary that contains all the profile data
     """
     profile_dict = collections.OrderedDict()
-    profile_box = html.find("div", {"class": "box-profile_text"})
+    profile_box = html.find("div", {"class": "prof-elem"})
     name = profile_box.find("p", {"class": "name"}).text
     profile_dict['name'] = name.strip().replace(" ",'')
-    profile_dict['furigana'] = profile_box.find("p",
-            {"class": "furigana"}).text.strip()
-    profile_dict['en_name'] = profile_box.find("span",
-            {"class": "en"}).text.replace("\u3000", " ")
+    profile_dict['kana'] = profile_box.find("p",
+            {"class": "kana"}).text.strip()
+    profile_dict['en_name'] = profile_box.find("p",
+            {"class": "eigo wf-a"}).text.replace('\u3000', ' ')
 
-    info_box = profile_box.find("div", {"class": "box-info"})
-    all_info = info_box.findAll("dt")
+    info_box = profile_box.find("dl", {"class": "dltb"})
+    all_info = info_box.findAll("dd")
 
     info_arr = []
     for info in all_info:
         info_arr.append(info.text.strip())
 
     # TO DO: Improve this as it's more than 80 char
-    profile_dict['birthday'], profile_dict['horoscope'], profile_dict['height'], profile_dict['birthplace'], profile_dict['blood_type'] = info_arr
+    profile_dict['birthday'], profile_dict['horoscope'], profile_dict['height'],profile_dict['birthplace'], profile_dict['blood_type'] = info_arr
     return profile_dict
 
 
